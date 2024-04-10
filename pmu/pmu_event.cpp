@@ -8,19 +8,30 @@
  * IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR
  * PURPOSE.
  * See the Mulan PSL v2 for more details.
- * Author: Mr.Ye
+ * Author: Mr.Zhang
  * Create: 2024-04-03
- * Description: core event map declaration
+ * Description: function for mapping system errors to custom error codes in the KUNPENG_PMU namespace
  ******************************************************************************/
-#ifndef CORE_H
-#define CORE_H
-#include <unordered_map>
-#include "pfm_event.h"
-#include "pfm_name.h"
+#include "pcerrc.h"
+#include "pmu_event.h"
 
 namespace KUNPENG_PMU {
-    extern const CORE_EVT_MAP CORE_EVENT_MAP;
-}
-
-#endif
-
+    int MapErrno(int sysErr)
+    {
+        switch (sysErr) {
+            case EPERM:
+            case EACCES:
+                return LIBPERF_ERR_NO_PERMISSION;
+            case EBUSY:
+                return LIBPERF_ERR_DEVICE_BUSY;
+            case EINVAL:
+                return LIBPERF_ERR_DEVICE_INVAL;
+            case ESRCH:
+                return LIBPERF_ERR_NO_PROC;
+            case EMFILE:
+                return LIBPERF_ERR_TOO_MANY_FD;
+            default:
+                return UNKNOWN_ERROR;
+        }
+    }
+}  // namespace KUNPENG_PMU

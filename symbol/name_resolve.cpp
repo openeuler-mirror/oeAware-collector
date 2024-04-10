@@ -8,32 +8,21 @@
  * IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR
  * PURPOSE.
  * See the Mulan PSL v2 for more details.
- * Author: Mr.Wang
+ * Author: Mr.Li
  * Create: 2024-04-03
- * Description: Get CPU topology and chip type.
+ * Description: Reverse the symbols in the C ++ ABI specification and convert it into a readable function name.
  ******************************************************************************/
-#ifndef CPU_MAP_H
-#define CPU_MAP_H
-#include <numa.h>
-#include "pmu.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <cxxabi.h>
+#include <iostream>
+#include <memory>
+#include <name_resolve.h>
 
-enum CHIP_TYPE {
-    UNDEFINED_TYPE = 0,
-    HIPA = 1,
-    HIPB = 2,
-};
-
-struct CpuTopology {
-    int coreId;
-    int numaId;
-    int socketId;
-};
-struct CpuTopology* GetCpuTopology(int coreId);
-CHIP_TYPE GetCpuType();
-#ifdef __cplusplus
+char* CppNamedDemangle(const char* abiName)
+{
+    int status;
+    char* name = abi::__cxa_demangle(abiName, nullptr, nullptr, &status);
+    if (status != 0) {
+        return nullptr;
+    }
+    return name;
 }
-#endif
-#endif
