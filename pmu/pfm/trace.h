@@ -10,11 +10,11 @@
  * See the Mulan PSL v2 for more details.
  * Author: Mr.Ye
  * Create: 2024-04-03
- * Description: get-trace-point-event interface
+ * Description: trace point event query interface
  ******************************************************************************/
 #ifndef TRACE_H
 #define TRACE_H
 
-int64_t GetTraceEventID(const std::string &name);
+struct PmuEvt* GetKernelTraceEvent(const char* pmuName, int collectType);
 
 #endif
