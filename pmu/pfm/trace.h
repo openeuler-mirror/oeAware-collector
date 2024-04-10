@@ -8,32 +8,13 @@
  * IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR
  * PURPOSE.
  * See the Mulan PSL v2 for more details.
- * Author: Mr.Wang
+ * Author: Mr.Ye
  * Create: 2024-04-03
- * Description: Get CPU topology and chip type.
+ * Description: get-trace-point-event interface
  ******************************************************************************/
-#ifndef CPU_MAP_H
-#define CPU_MAP_H
-#include <numa.h>
-#include "pmu.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ifndef TRACE_H
+#define TRACE_H
 
-enum CHIP_TYPE {
-    UNDEFINED_TYPE = 0,
-    HIPA = 1,
-    HIPB = 2,
-};
+int64_t GetTraceEventID(const std::string &name);
 
-struct CpuTopology {
-    int coreId;
-    int numaId;
-    int socketId;
-};
-struct CpuTopology* GetCpuTopology(int coreId);
-CHIP_TYPE GetCpuType();
-#ifdef __cplusplus
-}
-#endif
 #endif
