@@ -12,6 +12,8 @@
 #include "collector.h"
 #include "plugin_sampling.h"
 #include "plugin_counting.h"
+#include "plugin_uncore.h"
+#include "plugin_spe.h"
 
 struct CollectorInterface sampling_collector = {
     .get_name = sampling_get_name,
@@ -31,12 +33,32 @@ struct CollectorInterface counting_collector = {
     .reflash_ring_buf = counting_reflash_ring_buf,
 };
 
+struct CollectorInterface uncore_collector = {
+    .get_name = uncore_get_name,
+    .get_cycle = uncore_get_cycle,
+    .enable = uncore_enable,
+    .disable = uncore_disable,
+    .get_ring_buf = uncore_get_ring_buf,
+    .reflash_ring_buf = uncore_reflash_ring_buf,
+};
+
+struct CollectorInterface spe_collector = {
+    .get_name = spe_get_name,
+    .get_cycle = spe_get_cycle,
+    .enable = spe_enable,
+    .disable = spe_disable,
+    .get_ring_buf = spe_get_ring_buf,
+    .reflash_ring_buf = spe_reflash_ring_buf,
+};
+
 int get_instance(struct CollectorInterface **ins)
 {
     int ins_count = 0;
 
     ins[ins_count++] = &sampling_collector;
     ins[ins_count++] = &counting_collector;
+    ins[ins_count++] = &uncore_collector;
+    ins[ins_count++] = &spe_collector;
 
     return ins_count;
 }
