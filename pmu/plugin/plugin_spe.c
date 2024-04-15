@@ -53,7 +53,7 @@ static int spe_open()
     attr.numPid = 0;
     attr.cpuList = NULL;
     attr.numCpu = 0;
-    attr.period = 1000;
+    attr.period = 2048;
     attr.dataFilter = SPE_DATA_ALL;
     attr.evFilter = SPE_EVENT_RETIRED;
     attr.minLatency = 0x60;
@@ -128,5 +128,5 @@ char *spe_get_name()
 
 int spe_get_cycle()
 {
-    return 10;
+    return 100;
 }

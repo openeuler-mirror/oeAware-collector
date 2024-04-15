@@ -56,7 +56,6 @@ static int counting_open()
     attr.numPid = 0;
     attr.cpuList = NULL;
     attr.numCpu = 0;
-    attr.period = 1000;
 
     pd = PmuOpen(COUNTING, &attr);
     if (pd == -1) {
@@ -130,5 +129,5 @@ char *counting_get_name()
 
 int counting_get_cycle()
 {
-    return 10;
+    return 100;
 }
