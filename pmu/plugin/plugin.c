@@ -15,6 +15,10 @@
 #include "plugin_uncore.h"
 #include "plugin_spe.h"
 
+#define INS_COLLECTOR_MAX 10
+
+static struct CollectorInterface ins_collector[INS_COLLECTOR_MAX] = {0};
+
 struct CollectorInterface sampling_collector = {
     .get_name = sampling_get_name,
     .get_cycle = sampling_get_cycle,
@@ -55,10 +59,11 @@ int get_instance(struct CollectorInterface **ins)
 {
     int ins_count = 0;
 
-    ins[ins_count++] = &sampling_collector;
-    ins[ins_count++] = &counting_collector;
-    ins[ins_count++] = &uncore_collector;
-    ins[ins_count++] = &spe_collector;
+    ins_collector[ins_count++] = sampling_collector;
+    ins_collector[ins_count++] = counting_collector;
+    ins_collector[ins_count++] = uncore_collector;
+    ins_collector[ins_count++] = spe_collector;
+    *ins = &ins_collector[0];
 
     return ins_count;
 }

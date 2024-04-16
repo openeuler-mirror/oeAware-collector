@@ -48,7 +48,7 @@ static int sampling_open()
     char *evtList[1];
     int pd;
 
-    evtList[0] = "r11";
+    evtList[0] = "cycles";
 
     attr.evtList = evtList;
     attr.numEvt = 1;
@@ -56,7 +56,8 @@ static int sampling_open()
     attr.numPid = 0;
     attr.cpuList = NULL;
     attr.numCpu = 0;
-    attr.period = 1000;
+    attr.freq = 100;
+    attr.useFreq = 1;
 
     pd = PmuOpen(SAMPLING, &attr);
     if (pd == -1) {
@@ -129,5 +130,5 @@ char *sampling_get_name()
 
 int sampling_get_cycle()
 {
-    return 10;
+    return 100;
 }
