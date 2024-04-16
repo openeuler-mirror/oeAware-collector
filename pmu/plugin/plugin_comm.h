@@ -9,17 +9,24 @@
  * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
  * See the Mulan PSL v2 for more details.
  ******************************************************************************/
-#ifndef __PMU_PLUGIN_H__
-#define __PMU_PLUGIN_H__
+#ifndef __PLUGIN_COMM_H__
+#define __PLUGIN_COMM_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define PMU_CYCLES_COUNTING "PMU_CYCLES_COUNTING"
-#define PMU_CYCLES_SAMPLING "PMU_CYCLES_SAMPLING"
-#define PMU_UNCORE "PMU_UNCORE"
-#define PMU_SPE "PMU_SPE"
+#define CYCLES_COUNTING_BUF_SIZE  10
+#define CYCLES_SAMPLING_BUF_SIZE  10
+#define UNCORE_BUF_SIZE           10
+#define SPE_BUF_SIZE              10
+
+struct DataHeader;
+struct PmuData;
+
+struct DataHeader *init_buf(int buf_len, const char *type);
+void free_buf(struct DataHeader *data_header);
+void fill_buf(struct DataHeader *data_header, struct PmuData *pmu_data, int len);
 
 #ifdef __cplusplus
 }

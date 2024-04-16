@@ -16,6 +16,7 @@
 #include "pcerrc.h"
 #include "collector.h"
 #include "pmu_plugin.h"
+#include "plugin_comm.h"
 #include "plugin_counting.h"
 
 static bool counting_is_open = false;
@@ -25,21 +26,12 @@ struct PmuData *counting_data = NULL;
 
 static void counting_init()
 {
-    counting_buf = (struct DataHeader *)malloc(sizeof(struct DataHeader));
-    if (!counting_buf) {
-        printf("malloc counting_buf failed\n");
-        return;
-    }
+    counting_buf = init_buf(CYCLES_COUNTING_BUF_SIZE, PMU_CYCLES_COUNTING);
 }
 
 static void counting_fini()
 {
-    if (!counting_buf) {
-        return;
-    }
-
-    free(counting_buf);
-    counting_buf = NULL;
+    free_buf(counting_buf);
 }
 
 static int counting_open()
@@ -99,7 +91,6 @@ void *counting_get_ring_buf()
 void counting_reflash_ring_buf()
 {
     struct DataHeader *data_header;
-    struct cycles_counting_buf *buf;
     int len;
 
     data_header = (struct DataHeader *)counting_buf;
@@ -108,18 +99,11 @@ void counting_reflash_ring_buf()
         return;
     }
 
-    if (counting_data) {
-        PmuDataFree(counting_data);
-        counting_data = NULL;
-    }
-
     counting_disable();
     len = PmuRead(counting_pd, &counting_data);
     counting_enable();
 
-    data_header->len = len;
-    data_header->type = PMU_CYCLES_COUNTING;
-    data_header->data = counting_data;
+    fill_buf(data_header, counting_data, len);
 }
 
 char *counting_get_name()
@@ -130,4 +114,24 @@ char *counting_get_name()
 int counting_get_cycle()
 {
     return 100;
+}
+
+char *counting_get_version()
+{
+    return NULL;
+}
+
+char *counting_get_description()
+{
+    return NULL;
+}
+
+char *counting_get_type()
+{
+    return NULL;
+}
+
+char **counting_get_dep(int *len)
+{
+    return NULL;
 }

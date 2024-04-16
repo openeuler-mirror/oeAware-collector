@@ -16,6 +16,7 @@
 #include "pcerrc.h"
 #include "collector.h"
 #include "pmu_plugin.h"
+#include "plugin_comm.h"
 #include "plugin_spe.h"
 
 static bool spe_is_open = false;
@@ -25,21 +26,12 @@ struct PmuData *spe_data = NULL;
 
 static void spe_init()
 {
-    spe_buf = (struct DataHeader *)malloc(sizeof(struct DataHeader));
-    if (!spe_buf) {
-        printf("malloc spe_buf failed\n");
-        return;
-    }
+    spe_buf = init_buf(SPE_BUF_SIZE, PMU_SPE);
 }
 
 static void spe_fini()
 {
-    if (!spe_buf) {
-        return;
-    }
-
-    free(spe_buf);
-    spe_buf = NULL;
+    free_buf(spe_buf);
 }
 
 static int spe_open()
@@ -108,17 +100,10 @@ void spe_reflash_ring_buf()
         return;
     }
 
-    if (spe_data) {
-        PmuDataFree(spe_data);
-        spe_data = NULL;
-    }
-
     // while using PMU_SPE, PmuRead internally calls PmuEnable and PmuDisable
     len = PmuRead(spe_pd, &spe_data);
 
-    data_header->len = len;
-    data_header->type = PMU_SPE;
-    data_header->data = spe_data;
+    fill_buf(data_header, spe_data, len);
 }
 
 char *spe_get_name()
@@ -129,4 +114,24 @@ char *spe_get_name()
 int spe_get_cycle()
 {
     return 100;
+}
+
+char *spe_get_version()
+{
+    return NULL;
+}
+
+char *spe_get_description()
+{
+    return NULL;
+}
+
+char *spe_get_type()
+{
+    return NULL;
+}
+
+char **spe_get_dep(int *len)
+{
+    return NULL;
 }

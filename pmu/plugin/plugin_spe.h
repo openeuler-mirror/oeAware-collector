@@ -16,6 +16,10 @@
 extern "C" {
 #endif
 
+char *spe_get_version();
+char *spe_get_description();
+char *spe_get_type();
+char **spe_get_dep(int *len);
 void spe_enable();
 void spe_disable();
 void *spe_get_ring_buf();

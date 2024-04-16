@@ -16,6 +16,10 @@
 extern "C" {
 #endif
 
+char *uncore_get_version();
+char *uncore_get_description();
+char *uncore_get_type();
+char **uncore_get_dep(int *len);
 void uncore_enable();
 void uncore_disable();
 void *uncore_get_ring_buf();

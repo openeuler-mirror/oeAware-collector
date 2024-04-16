@@ -16,6 +16,7 @@
 #include "pcerrc.h"
 #include "collector.h"
 #include "pmu_plugin.h"
+#include "plugin_comm.h"
 #include "plugin_uncore.h"
 #include "pmu_uncore.h"
 
@@ -26,21 +27,12 @@ struct PmuData *uncore_data = NULL;
 
 static void uncore_init()
 {
-    uncore_buf = (struct DataHeader *)malloc(sizeof(struct DataHeader));
-    if (!uncore_buf) {
-        printf("malloc uncore_buf failed\n");
-        return;
-    }
+    uncore_buf = init_buf(UNCORE_BUF_SIZE, PMU_UNCORE);
 }
 
 static void uncore_fini()
 {
-    if (!uncore_buf) {
-        return;
-    }
-
-    free(uncore_buf);
-    uncore_buf = NULL;
+    free_buf(uncore_buf);
 }
 
 static int uncore_open()
@@ -128,18 +120,11 @@ void uncore_reflash_ring_buf()
         return;
     }
 
-    if (uncore_data) {
-        PmuDataFree(uncore_data);
-        uncore_data = NULL;
-    }
-
     uncore_disable();
     len = PmuRead(uncore_pd, &uncore_data);
     uncore_enable();
 
-    data_header->len = len;
-    data_header->type = PMU_UNCORE;
-    data_header->data = uncore_data;
+    fill_buf(data_header, uncore_data, len);
 }
 
 char *uncore_get_name()
@@ -150,4 +135,24 @@ char *uncore_get_name()
 int uncore_get_cycle()
 {
     return 100;
+}
+
+char *uncore_get_version()
+{
+    return NULL;
+}
+
+char *uncore_get_description()
+{
+    return NULL;
+}
+
+char *uncore_get_type()
+{
+    return NULL;
+}
+
+char **uncore_get_dep(int *len)
+{
+    return NULL;
 }
