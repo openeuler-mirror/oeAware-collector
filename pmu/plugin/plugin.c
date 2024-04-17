@@ -20,6 +20,10 @@
 static struct CollectorInterface ins_collector[INS_COLLECTOR_MAX] = {0};
 
 struct CollectorInterface sampling_collector = {
+    .get_version = sampling_get_version,
+    .get_description = sampling_get_description,
+    .get_type = sampling_get_type,
+    .get_dep = sampling_get_dep,
     .get_name = sampling_get_name,
     .get_cycle = sampling_get_cycle,
     .enable = sampling_enable,
@@ -29,6 +33,10 @@ struct CollectorInterface sampling_collector = {
 };
 
 struct CollectorInterface counting_collector = {
+    .get_version = counting_get_version,
+    .get_description = counting_get_description,
+    .get_type = counting_get_type,
+    .get_dep = counting_get_dep,
     .get_name = counting_get_name,
     .get_cycle = counting_get_cycle,
     .enable = counting_enable,
@@ -38,6 +46,10 @@ struct CollectorInterface counting_collector = {
 };
 
 struct CollectorInterface uncore_collector = {
+    .get_version = uncore_get_version,
+    .get_description = uncore_get_description,
+    .get_type = uncore_get_type,
+    .get_dep = uncore_get_dep,
     .get_name = uncore_get_name,
     .get_cycle = uncore_get_cycle,
     .enable = uncore_enable,
@@ -47,6 +59,10 @@ struct CollectorInterface uncore_collector = {
 };
 
 struct CollectorInterface spe_collector = {
+    .get_version = spe_get_version,
+    .get_description = spe_get_description,
+    .get_type = spe_get_type,
+    .get_dep = spe_get_dep,
     .get_name = spe_get_name,
     .get_cycle = spe_get_cycle,
     .enable = spe_enable,

@@ -16,6 +16,7 @@
 #include "pcerrc.h"
 #include "collector.h"
 #include "pmu_plugin.h"
+#include "plugin_comm.h"
 #include "plugin_sampling.h"
 
 static bool sampling_is_open = false;
@@ -25,21 +26,12 @@ struct PmuData *sampling_data = NULL;
 
 static void sampling_init()
 {
-    sampling_buf = (void *)malloc(sizeof(struct DataHeader));
-    if (!sampling_buf) {
-        printf("malloc spe_buf failed\n");
-        return;
-    }
+    sampling_buf = init_buf(CYCLES_SAMPLING_BUF_SIZE, PMU_CYCLES_SAMPLING);
 }
 
 static void sampling_fini()
 {
-    if (!sampling_buf) {
-        return;
-    }
-
-    free(sampling_buf);
-    sampling_buf = NULL;
+    free_buf(sampling_buf);
 }
 
 static int sampling_open()
@@ -109,18 +101,11 @@ void sampling_reflash_ring_buf()
         return;
     }
 
-    if (sampling_data) {
-        PmuDataFree(sampling_data);
-        sampling_data = NULL;
-    }
-
     sampling_disable();
     len = PmuRead(sampling_pd, &sampling_data);
     sampling_enable();
 
-    data_header->len = len;
-    data_header->type = PMU_CYCLES_SAMPLING;
-    data_header->data = sampling_data;
+    fill_buf(data_header, sampling_data, len);
 }
 
 char *sampling_get_name()
@@ -131,4 +116,24 @@ char *sampling_get_name()
 int sampling_get_cycle()
 {
     return 100;
+}
+
+char *sampling_get_version()
+{
+    return NULL;
+}
+
+char *sampling_get_description()
+{
+    return NULL;
+}
+
+char *sampling_get_type()
+{
+    return NULL;
+}
+
+char **sampling_get_dep(int *len)
+{
+    return NULL;
 }

@@ -16,6 +16,10 @@
 extern "C" {
 #endif
 
+char *sampling_get_version();
+char *sampling_get_description();
+char *sampling_get_type();
+char **sampling_get_dep(int *len);
 void sampling_enable();
 void sampling_disable();
 void *sampling_get_ring_buf();

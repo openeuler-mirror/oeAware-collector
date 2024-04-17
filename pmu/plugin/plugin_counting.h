@@ -16,6 +16,10 @@
 extern "C" {
 #endif
 
+char *counting_get_version();
+char *counting_get_description();
+char *counting_get_type();
+char **counting_get_dep(int *len);
 void counting_enable();
 void counting_disable();
 void *counting_get_ring_buf();
