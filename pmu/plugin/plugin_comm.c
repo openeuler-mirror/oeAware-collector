@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <securec.h>
 #include "pmu.h"
 #include "collector.h"
 
