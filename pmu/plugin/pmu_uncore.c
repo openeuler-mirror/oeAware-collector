@@ -97,7 +97,7 @@ int hha_uncore_config_init(void)
     struct dirent **namelist;
 
     hha_num = scandir(DEVICE_PATH, &namelist, hha_scandir_select, alphasort);
-    if (hha_num < 0) {
+    if (hha_num <= 0) {
         printf("scandir failed\n");
         return -1;
     }

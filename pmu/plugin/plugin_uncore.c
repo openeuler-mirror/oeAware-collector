@@ -45,9 +45,14 @@ static int uncore_open()
     int pd = -1;
     int ret;
 
+    // Base on oeAware framework, uncore_open is called within uncore_enable.
+    // If pmu_uncore is not supported, it will generate a large number of error logs.
+    // So temporarily set uncore_is_open = true util oeAware framework provides open API.
+    uncore_is_open = true;
+
     ret = hha_uncore_config_init();
     if (ret != 0) {
-        printf("hha init failed\n");
+        printf("This system not support pmu_uncore\n");
         return pd;
     }
 
@@ -76,7 +81,6 @@ static int uncore_open()
         return pd;
     }
 
-    uncore_is_open = true;
     return pd;
 }
 
