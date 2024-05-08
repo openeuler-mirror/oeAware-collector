@@ -101,9 +101,9 @@ void sampling_reflash_ring_buf()
         return;
     }
 
-    sampling_disable();
+    PmuDisable(sampling_pd);
     len = PmuRead(sampling_pd, &sampling_data);
-    sampling_enable();
+    PmuEnable(sampling_pd);
 
     fill_buf(data_header, sampling_data, len);
 }

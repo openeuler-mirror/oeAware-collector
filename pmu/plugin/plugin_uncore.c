@@ -124,9 +124,9 @@ void uncore_reflash_ring_buf()
         return;
     }
 
-    uncore_disable();
+    PmuDisable(uncore_pd);
     len = PmuRead(uncore_pd, &uncore_data);
-    uncore_enable();
+    PmuEnable(uncore_pd);
 
     fill_buf(data_header, uncore_data, len);
 }
