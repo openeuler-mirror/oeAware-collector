@@ -99,9 +99,9 @@ void counting_reflash_ring_buf()
         return;
     }
 
-    counting_disable();
+    PmuDisable(counting_pd);
     len = PmuRead(counting_pd, &counting_data);
-    counting_enable();
+    PmuEnable(counting_pd);
 
     fill_buf(data_header, counting_data, len);
 }
