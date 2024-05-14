@@ -31,7 +31,12 @@ static void spe_init()
 
 static void spe_fini()
 {
+    if (!spe_buf) {
+        return;
+    }
+
     free_buf(spe_buf);
+    spe_buf = NULL;
 }
 
 static int spe_open()
@@ -82,6 +87,8 @@ void spe_enable()
 void spe_disable()
 {
     PmuDisable(spe_pd);
+    spe_close();
+    spe_fini();
 }
 
 void *spe_get_ring_buf()
@@ -133,5 +140,6 @@ char *spe_get_type()
 
 char **spe_get_dep(int *len)
 {
+    *len = 0;
     return NULL;
 }

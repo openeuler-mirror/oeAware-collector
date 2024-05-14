@@ -31,7 +31,12 @@ static void counting_init()
 
 static void counting_fini()
 {
+    if (!counting_buf) {
+        return;
+    }
+
     free_buf(counting_buf);
+    counting_buf = NULL;
 }
 
 static int counting_open()
@@ -81,6 +86,8 @@ void counting_enable()
 void counting_disable()
 {
     PmuDisable(counting_pd);
+    counting_close();
+    counting_fini();
 }
 
 void *counting_get_ring_buf()
@@ -133,5 +140,6 @@ char *counting_get_type()
 
 char **counting_get_dep(int *len)
 {
+    *len = 0;
     return NULL;
 }

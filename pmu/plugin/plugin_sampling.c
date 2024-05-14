@@ -31,7 +31,12 @@ static void sampling_init()
 
 static void sampling_fini()
 {
+    if (!sampling_buf) {
+        return;
+    }
+
     free_buf(sampling_buf);
+    sampling_buf = NULL;
 }
 
 static int sampling_open()
@@ -83,6 +88,8 @@ void sampling_enable()
 void sampling_disable()
 {
     PmuDisable(sampling_pd);
+    sampling_close();
+    sampling_fini();
 }
 
 void *sampling_get_ring_buf()
@@ -135,5 +142,6 @@ char *sampling_get_type()
 
 char **sampling_get_dep(int *len)
 {
+    *len = 0;
     return NULL;
 }

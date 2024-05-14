@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <dirent.h>
+#include <securec.h>
 #include "pmu_uncore.h"
 
 static int hha_num = 0;
@@ -45,7 +46,7 @@ static int read_single_uncore_event(const char *hha_name, struct uncore_config *
     char hha_path[MAX_PATH_LEN] = {0};
 
     // Read cfg
-    snprintf(hha_path, MAX_PATH_LEN, "%s/%s/", hha_name, event_name);
+    snprintf_truncated_s(hha_path, MAX_PATH_LEN, "%s/%s/", hha_name, event_name);
     
     strcpy(uncore_event->uncore_name, hha_path);
 
