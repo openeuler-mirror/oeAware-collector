@@ -32,7 +32,12 @@ static void uncore_init()
 
 static void uncore_fini()
 {
+    if (!uncore_buf) {
+        return;
+    }
+
     free_buf(uncore_buf);
+    uncore_buf = NULL;
 }
 
 static int uncore_open()
@@ -106,6 +111,8 @@ void uncore_enable()
 void uncore_disable()
 {
     PmuDisable(uncore_pd);
+    uncore_close();
+    uncore_fini();
 }
 
 void *uncore_get_ring_buf()
@@ -158,5 +165,6 @@ char *uncore_get_type()
 
 char **uncore_get_dep(int *len)
 {
+    *len = 0;
     return NULL;
 }

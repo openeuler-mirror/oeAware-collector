@@ -20,7 +20,7 @@
 #include <dirent.h>
 
 const std::string PATH = "/proc";
-char *THREAD_NAME = "thread_collector";
+char thread_name[] = "thread_collector";
 const int CYCLE_SIZE = 100;
 const std::string STATUS_NAME = "Name:\t";
 const int STATUS_NAME_LENGTH = 6;
@@ -74,7 +74,7 @@ static int get_all_threads() {
 }
 
 char* get_name() {
-    return THREAD_NAME;
+    return thread_name;
 }
 
 char* get_version() {
@@ -122,6 +122,7 @@ struct CollectorInterface thread_collect = {
     .get_description = get_description,
     .get_type = get_type,
     .get_cycle = get_cycle,
+    .get_dep = nullptr,
     .enable = enable,
     .disable = disable,
     .get_ring_buf = get_ring_buf,
