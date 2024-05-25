@@ -16,10 +16,10 @@
 extern "C" {
 #endif
 
-#define PMU_CYCLES_COUNTING "PMU_CYCLES_COUNTING"
-#define PMU_CYCLES_SAMPLING "PMU_CYCLES_SAMPLING"
-#define PMU_UNCORE "PMU_UNCORE"
-#define PMU_SPE "PMU_SPE"
+#define PMU_CYCLES_COUNTING "pmu_cycles_counting"
+#define PMU_CYCLES_SAMPLING "pmu_cycles_sampling"
+#define PMU_UNCORE "pmu_uncore_counting"
+#define PMU_SPE "pmu_spe_sampling"
 
 #ifdef __cplusplus
 }

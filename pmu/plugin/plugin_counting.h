@@ -16,16 +16,17 @@
 extern "C" {
 #endif
 
-char *counting_get_version();
-char *counting_get_description();
-char *counting_get_type();
-char **counting_get_dep(int *len);
-void counting_enable();
+const char *counting_get_version();
+const char *counting_get_name();
+const char *counting_get_description();
+const char *counting_get_dep();
+int counting_get_priority();
+int counting_get_type();
+int counting_get_period();
+bool counting_enable();
 void counting_disable();
-void *counting_get_ring_buf();
-void counting_reflash_ring_buf();
-char *counting_get_name();
-int counting_get_cycle();
+const struct DataRingBuf *counting_get_ring_buf();
+void counting_run(const struct Param *param);
 
 #ifdef __cplusplus
 }

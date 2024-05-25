@@ -14,7 +14,7 @@
 #include <stdbool.h>
 #include "pmu.h"
 #include "pcerrc.h"
-#include "collector.h"
+#include "interface.h"
 #include "pmu_plugin.h"
 #include "plugin_comm.h"
 #include "plugin_uncore.h"
@@ -22,12 +22,17 @@
 
 static bool uncore_is_open = false;
 static int uncore_pd = -1;
-static struct DataHeader *uncore_buf = NULL;
+static struct DataRingBuf *uncore_buf = NULL;
 struct PmuData *uncore_data = NULL;
 
-static void uncore_init()
+static int uncore_init()
 {
     uncore_buf = init_buf(UNCORE_BUF_SIZE, PMU_UNCORE);
+    if (!uncore_buf) {
+        return -1;
+    }
+
+    return 0;
 }
 
 static void uncore_fini()
@@ -92,20 +97,31 @@ static int uncore_open()
 static void uncore_close()
 {
     PmuClose(uncore_pd);
+    uncore_pd = -1;
     uncore_is_open = false;
 }
 
-void uncore_enable()
+bool uncore_enable()
 {
     if (!uncore_buf) {
-        uncore_init();
+        int ret = uncore_init();
+        if (ret != 0) {
+            goto err;
+        }
     }
 
     if (!uncore_is_open) {
         uncore_pd = uncore_open();
+        if (uncore_pd == -1) {
+            uncore_fini();
+            goto err;
+        }
     }
 
-    PmuEnable(uncore_pd);
+    return PmuEnable(uncore_pd) == 0;
+
+err:
+    return false;
 }
 
 void uncore_disable()
@@ -115,18 +131,18 @@ void uncore_disable()
     uncore_fini();
 }
 
-void *uncore_get_ring_buf()
+const struct DataRingBuf *uncore_get_ring_buf()
 {
-    return uncore_buf;
+    return (const struct DataRingBuf *)uncore_buf;
 }
 
-void uncore_reflash_ring_buf()
+static void uncore_reflash_ring_buf()
 {
-    struct DataHeader *data_header;
+    struct DataRingBuf *data_ringbuf;
     int len;
 
-    data_header = (struct DataHeader *)uncore_buf;
-    if (!data_header) {
+    data_ringbuf = (struct DataRingBuf *)uncore_buf;
+    if (!data_ringbuf) {
         printf("uncore_buf has not malloc\n");
         return;
     }
@@ -135,36 +151,46 @@ void uncore_reflash_ring_buf()
     len = PmuRead(uncore_pd, &uncore_data);
     PmuEnable(uncore_pd);
 
-    fill_buf(data_header, uncore_data, len);
+    fill_buf(data_ringbuf, uncore_data, len);
 }
 
-char *uncore_get_name()
+void uncore_run(const struct Param *param)
 {
-    return "collector_pmu_uncore";
+    (void)param;
+    uncore_reflash_ring_buf();
 }
 
-int uncore_get_cycle()
+const char *uncore_get_version()
+{
+    return NULL;
+}
+
+const char *uncore_get_name()
+{
+    return PMU_UNCORE;
+}
+
+const char *uncore_get_description()
+{
+    return NULL;
+}
+
+const char *uncore_get_dep()
+{
+    return NULL;
+}
+
+int uncore_get_priority()
+{
+    return 0;
+}
+
+int uncore_get_type()
+{
+    return -1;
+}
+
+int uncore_get_period()
 {
     return 100;
-}
-
-char *uncore_get_version()
-{
-    return NULL;
-}
-
-char *uncore_get_description()
-{
-    return NULL;
-}
-
-char *uncore_get_type()
-{
-    return NULL;
-}
-
-char **uncore_get_dep(int *len)
-{
-    *len = 0;
-    return NULL;
 }
