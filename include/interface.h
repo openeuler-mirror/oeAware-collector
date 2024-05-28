@@ -15,6 +15,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct DataBuf {
     int len;
     void *data;
@@ -62,5 +66,9 @@ struct Interface {
  * The return value is the number of instances.
  */
 int get_instance(struct Interface **interface);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

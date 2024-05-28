@@ -9,7 +9,7 @@
  * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
  * See the Mulan PSL v2 for more details.
  ******************************************************************************/
-#include "collector.h"
+#include "interface.h"
 #include "thread_info.h"
 #include <cstdio>
 #include <fstream>
@@ -24,7 +24,7 @@ char thread_name[] = "thread_collector";
 const int CYCLE_SIZE = 100;
 const std::string STATUS_NAME = "Name:\t";
 const int STATUS_NAME_LENGTH = 6;
-static DataHeader data_header;
+static DataRingBuf ring_buf;
 static DataBuf data_buf;
 static std::vector<ThreadInfo> threads(THREAD_NUM);
 
@@ -73,63 +73,66 @@ static int get_all_threads() {
     return num;
 }
 
-char* get_name() {
+const char* get_name() {
     return thread_name;
 }
 
-char* get_version() {
+const char* get_version() {
     return nullptr;
 }
 
-char* get_description() {
+const char* get_description() {
     return nullptr;
 }
 
-char* get_type() {
-    return nullptr;
-}
-
-int get_cycle() {
+int get_period() {
     return CYCLE_SIZE;
 }
-
-void enable() {
-    data_header.buf_len = 1;
-    data_header.buf = &data_buf; 
+int get_priority() {
+    return 0;
+}
+bool enable() {
+    ring_buf.buf_len = 1;
+    ring_buf.buf = &data_buf; 
+    return true;
 }
 
 void disable() {
     
 }
 
-void* get_ring_buf() {
-    return (void*)&data_header;
+const DataRingBuf* get_ring_buf() {
+    return &ring_buf;
 }
 
-void reflash_ring_buf() {
-    data_header.index++;
-    data_header.count++;
-    int index = data_header.count % data_header.buf_len;
+void run(const Param *param) {
+    if (param != nullptr) {
+        return;
+    }
+    ring_buf.index++;
+    ring_buf.count++;
+    int index = ring_buf.count % ring_buf.buf_len;
     int num = get_all_threads();
     data_buf.len = num;
     data_buf.data = threads.data();
-    data_header.buf[index] = data_buf;
+    ring_buf.buf[index] = data_buf;
 }
 
-struct CollectorInterface thread_collect = {
+struct Interface thread_collect = {
     .get_version = get_version,
     .get_name = get_name,
     .get_description = get_description,
-    .get_type = get_type,
-    .get_cycle = get_cycle,
     .get_dep = nullptr,
+    .get_priority = get_priority,
+    .get_type = nullptr,
+    .get_period = get_period,
     .enable = enable,
     .disable = disable,
     .get_ring_buf = get_ring_buf,
-    .reflash_ring_buf = reflash_ring_buf,
+    .run = run,
 };
 
-extern "C" int get_instance(CollectorInterface **ins) {
+extern "C" int get_instance(Interface **ins) {
     *ins = &thread_collect;
     return 1;
 }
