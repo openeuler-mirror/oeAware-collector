@@ -16,16 +16,17 @@
 extern "C" {
 #endif
 
-char *uncore_get_version();
-char *uncore_get_description();
-char *uncore_get_type();
-char **uncore_get_dep(int *len);
-void uncore_enable();
+const char *uncore_get_version();
+const char *uncore_get_name();
+const char *uncore_get_description();
+const char *uncore_get_dep();
+int uncore_get_priority();
+int uncore_get_type();
+int uncore_get_period();
+bool uncore_enable();
 void uncore_disable();
-void *uncore_get_ring_buf();
-void uncore_reflash_ring_buf();
-char *uncore_get_name();
-int uncore_get_cycle();
+const struct DataRingBuf *uncore_get_ring_buf();
+void uncore_run(const struct Param *param);
 
 #ifdef __cplusplus
 }

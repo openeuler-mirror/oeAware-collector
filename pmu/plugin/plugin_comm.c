@@ -14,72 +14,64 @@
 #include <string.h>
 #include <securec.h>
 #include "pmu.h"
-#include "collector.h"
+#include "interface.h"
 
-struct DataHeader *init_buf(int buf_len, const char *type)
+struct DataRingBuf *init_buf(int buf_len, const char *instance_name)
 {
-    struct DataHeader *data_header;
-    int ret;
+    struct DataRingBuf *data_ringbuf;
 
-    data_header = (struct DataHeader *)malloc(sizeof(struct DataHeader));
-    if (!data_header) {
-        printf("malloc data_header failed\n");
+    data_ringbuf = (struct DataRingBuf *)malloc(sizeof(struct DataRingBuf));
+    if (!data_ringbuf) {
+        printf("malloc data_ringbuf failed\n");
         return NULL;
     }
 
-    (void)memset_s(data_header, sizeof(struct DataHeader), 0, sizeof(struct DataHeader));
+    (void)memset_s(data_ringbuf, sizeof(struct DataRingBuf), 0, sizeof(struct DataRingBuf));
     
-    ret = strcpy_s(data_header->type, DATA_HEADER_TYPE_SIZE, type);
-    if (ret != 0) {
-        printf("strcpy_s data_header type failed\n");
-        free(data_header);
-        data_header = NULL;
+    data_ringbuf->instance_name = instance_name;
+    data_ringbuf->index = -1;
+
+    data_ringbuf->buf = (struct DataBuf *)malloc(sizeof(struct DataBuf) * buf_len);
+    if (!data_ringbuf->buf) {
+        printf("malloc data_ringbuf buf failed\n");
+        free(data_ringbuf);
+        data_ringbuf = NULL;
         return NULL;
     }
 
-    data_header->index = -1;
+    (void)memset_s(data_ringbuf->buf, sizeof(struct DataBuf) * buf_len, 0, sizeof(struct DataBuf) * buf_len);
+    data_ringbuf->buf_len = buf_len;
 
-    data_header->buf = (struct DataBuf *)malloc(sizeof(struct DataBuf) * buf_len);
-    if (!data_header->buf) {
-        printf("malloc data_header buf failed\n");
-        free(data_header);
-        data_header = NULL;
-        return NULL;
-    }
-
-    (void)memset_s(data_header->buf, sizeof(struct DataBuf) * buf_len, 0, sizeof(struct DataBuf) * buf_len);
-    data_header->buf_len = buf_len;
-
-    return data_header;
+    return data_ringbuf;
 }
 
-void free_buf(struct DataHeader *data_header)
+void free_buf(struct DataRingBuf *data_ringbuf)
 {
-    if (!data_header) {
+    if (!data_ringbuf) {
         return;
     }
 
-    if (!data_header->buf) {
+    if (!data_ringbuf->buf) {
         goto out;
     }
 
-    free(data_header->buf);
-    data_header->buf = NULL;
+    free(data_ringbuf->buf);
+    data_ringbuf->buf = NULL;
 
 out:
-    free(data_header);
-    data_header = NULL;
+    free(data_ringbuf);
+    data_ringbuf = NULL;
 }
 
-void fill_buf(struct DataHeader *data_header, struct PmuData *pmu_data, int len)
+void fill_buf(struct DataRingBuf *data_ringbuf, struct PmuData *pmu_data, int len)
 {
     struct DataBuf *buf;
     int index;
 
-    index = (data_header->index + 1) % data_header->buf_len;
-    data_header->index = index;
-    data_header->count++;
-    buf = &data_header->buf[index];
+    index = (data_ringbuf->index + 1) % data_ringbuf->buf_len;
+    data_ringbuf->index = index;
+    data_ringbuf->count++;
+    buf = &data_ringbuf->buf[index];
 
     if (buf->data != NULL) {
         PmuDataFree(buf->data);

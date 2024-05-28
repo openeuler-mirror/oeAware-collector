@@ -14,19 +14,24 @@
 #include <stdbool.h>
 #include "pmu.h"
 #include "pcerrc.h"
-#include "collector.h"
+#include "interface.h"
 #include "pmu_plugin.h"
 #include "plugin_comm.h"
 #include "plugin_spe.h"
 
 static bool spe_is_open = false;
 static int spe_pd = -1;
-static struct DataHeader *spe_buf = NULL;
+static struct DataRingBuf *spe_buf = NULL;
 struct PmuData *spe_data = NULL;
 
-static void spe_init()
+static int spe_init()
 {
     spe_buf = init_buf(SPE_BUF_SIZE, PMU_SPE);
+    if (!spe_buf) {
+        return -1;
+    }
+
+    return 0;
 }
 
 static void spe_fini()
@@ -68,20 +73,31 @@ static int spe_open()
 static void spe_close()
 {
     PmuClose(spe_pd);
+    spe_pd = -1;
     spe_is_open = false;
 }
 
-void spe_enable()
+bool spe_enable()
 {
     if (!spe_buf) {
-        spe_init();
+        int ret = spe_init();
+        if (ret != 0) {
+            goto err;
+        }
     }
 
     if (!spe_is_open) {
         spe_pd = spe_open();
+        if (spe_pd == -1) {
+            spe_fini();
+            goto err;
+        }
     }
 
-    PmuEnable(spe_pd);
+    return PmuEnable(spe_pd) == 0;
+
+err:
+    return false;
 }
 
 void spe_disable()
@@ -91,18 +107,18 @@ void spe_disable()
     spe_fini();
 }
 
-void *spe_get_ring_buf()
+const struct DataRingBuf *spe_get_ring_buf()
 {
-    return spe_buf;
+    return (const struct DataRingBuf *)spe_buf;
 }
 
-void spe_reflash_ring_buf()
+static void spe_reflash_ring_buf()
 {
-    struct DataHeader *data_header;
+    struct DataRingBuf *data_ringbuf;
     int len;
 
-    data_header = (struct DataHeader *)spe_buf;
-    if (!data_header) {
+    data_ringbuf = (struct DataRingBuf *)spe_buf;
+    if (!data_ringbuf) {
         printf("spe_buf has not malloc\n");
         return;
     }
@@ -110,36 +126,46 @@ void spe_reflash_ring_buf()
     // while using PMU_SPE, PmuRead internally calls PmuEnable and PmuDisable
     len = PmuRead(spe_pd, &spe_data);
 
-    fill_buf(data_header, spe_data, len);
+    fill_buf(data_ringbuf, spe_data, len);
 }
 
-char *spe_get_name()
+void spe_run(const struct Param *param)
 {
-    return "collector_spe";
+    (void)param;
+    spe_reflash_ring_buf();
 }
 
-int spe_get_cycle()
+const char *spe_get_version()
+{
+    return NULL;
+}
+
+const char *spe_get_name()
+{
+    return PMU_SPE;
+}
+
+const char *spe_get_description()
+{
+    return NULL;
+}
+
+const char *spe_get_dep()
+{
+    return NULL;
+}
+
+int spe_get_priority()
+{
+    return 0;
+}
+
+int spe_get_type()
+{
+    return -1;
+}
+
+int spe_get_period()
 {
     return 100;
-}
-
-char *spe_get_version()
-{
-    return NULL;
-}
-
-char *spe_get_description()
-{
-    return NULL;
-}
-
-char *spe_get_type()
-{
-    return NULL;
-}
-
-char **spe_get_dep(int *len)
-{
-    *len = 0;
-    return NULL;
 }

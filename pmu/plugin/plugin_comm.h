@@ -21,12 +21,12 @@ extern "C" {
 #define UNCORE_BUF_SIZE           10
 #define SPE_BUF_SIZE              10
 
-struct DataHeader;
+struct DataRingBuf;
 struct PmuData;
 
-struct DataHeader *init_buf(int buf_len, const char *type);
-void free_buf(struct DataHeader *data_header);
-void fill_buf(struct DataHeader *data_header, struct PmuData *pmu_data, int len);
+struct DataRingBuf *init_buf(int buf_len, const char *instance_name);
+void free_buf(struct DataRingBuf *data_ringbuf);
+void fill_buf(struct DataRingBuf *data_ringbuf, struct PmuData *pmu_data, int len);
 
 #ifdef __cplusplus
 }

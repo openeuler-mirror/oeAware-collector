@@ -16,16 +16,17 @@
 extern "C" {
 #endif
 
-char *sampling_get_version();
-char *sampling_get_description();
-char *sampling_get_type();
-char **sampling_get_dep(int *len);
-void sampling_enable();
+const char *sampling_get_version();
+const char *sampling_get_name();
+const char *sampling_get_description();
+const char *sampling_get_dep();
+int sampling_get_priority();
+int sampling_get_type();
+int sampling_get_period();
+bool sampling_enable();
 void sampling_disable();
-void *sampling_get_ring_buf();
-void sampling_reflash_ring_buf();
-char *sampling_get_name();
-int sampling_get_cycle();
+const struct DataRingBuf *sampling_get_ring_buf();
+void sampling_run(const struct Param *param);
 
 #ifdef __cplusplus
 }

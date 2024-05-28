@@ -14,19 +14,24 @@
 #include <stdbool.h>
 #include "pmu.h"
 #include "pcerrc.h"
-#include "collector.h"
+#include "interface.h"
 #include "pmu_plugin.h"
 #include "plugin_comm.h"
 #include "plugin_sampling.h"
 
 static bool sampling_is_open = false;
 static int sampling_pd = -1;
-static struct DataHeader *sampling_buf = NULL;
+static struct DataRingBuf *sampling_buf = NULL;
 struct PmuData *sampling_data = NULL;
 
-static void sampling_init()
+static int sampling_init()
 {
     sampling_buf = init_buf(CYCLES_SAMPLING_BUF_SIZE, PMU_CYCLES_SAMPLING);
+    if (!sampling_buf) {
+        return -1;
+    }
+
+    return 0;
 }
 
 static void sampling_fini()
@@ -69,20 +74,31 @@ static int sampling_open()
 static void sampling_close()
 {
     PmuClose(sampling_pd);
+    sampling_pd = -1;
     sampling_is_open = false;
 }
 
-void sampling_enable()
+bool sampling_enable()
 {
     if (!sampling_buf) {
-        sampling_init();
+        int ret = sampling_init();
+        if (ret != 0) {
+            goto err;
+        }
     }
 
     if (!sampling_is_open) {
         sampling_pd = sampling_open();
+        if (sampling_pd == -1) {
+            sampling_fini();
+            goto err;
+        }
     }
 
-    PmuEnable(sampling_pd);
+    return PmuEnable(sampling_pd) == 0;
+
+err:
+    return false;
 }
 
 void sampling_disable()
@@ -92,18 +108,18 @@ void sampling_disable()
     sampling_fini();
 }
 
-void *sampling_get_ring_buf()
+const struct DataRingBuf *sampling_get_ring_buf()
 {
-    return sampling_buf;
+    return (const struct DataRingBuf *)sampling_buf;
 }
 
-void sampling_reflash_ring_buf()
+static void sampling_reflash_ring_buf()
 {
-    struct DataHeader *data_header;
+    struct DataRingBuf *data_ringbuf;
     int len;
 
-    data_header = (struct DataHeader *)sampling_buf;
-    if (!data_header) {
+    data_ringbuf = (struct DataRingBuf *)sampling_buf;
+    if (!data_ringbuf) {
         printf("sampling_buf has not malloc\n");
         return;
     }
@@ -112,36 +128,46 @@ void sampling_reflash_ring_buf()
     len = PmuRead(sampling_pd, &sampling_data);
     PmuEnable(sampling_pd);
 
-    fill_buf(data_header, sampling_data, len);
+    fill_buf(data_ringbuf, sampling_data, len);
 }
 
-char *sampling_get_name()
+void sampling_run(const struct Param *param)
 {
-    return "collector_pmu_sampling";
+    (void)param;
+    sampling_reflash_ring_buf();
 }
 
-int sampling_get_cycle()
+const char *sampling_get_version()
+{
+    return NULL;
+}
+
+const char *sampling_get_name()
+{
+    return PMU_CYCLES_SAMPLING;
+}
+
+const char *sampling_get_description()
+{
+    return NULL;
+}
+
+const char *sampling_get_dep()
+{
+    return NULL;
+}
+
+int sampling_get_priority()
+{
+    return 0;
+}
+
+int sampling_get_type()
+{
+    return -1;
+}
+
+int sampling_get_period()
 {
     return 100;
-}
-
-char *sampling_get_version()
-{
-    return NULL;
-}
-
-char *sampling_get_description()
-{
-    return NULL;
-}
-
-char *sampling_get_type()
-{
-    return NULL;
-}
-
-char **sampling_get_dep(int *len)
-{
-    *len = 0;
-    return NULL;
 }

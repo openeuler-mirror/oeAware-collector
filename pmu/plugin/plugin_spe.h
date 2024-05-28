@@ -16,16 +16,17 @@
 extern "C" {
 #endif
 
-char *spe_get_version();
-char *spe_get_description();
-char *spe_get_type();
-char **spe_get_dep(int *len);
-void spe_enable();
+const char *spe_get_version();
+const char *spe_get_name();
+const char *spe_get_description();
+const char *spe_get_dep();
+int spe_get_priority();
+int spe_get_type();
+int spe_get_period();
+bool spe_enable();
 void spe_disable();
-void *spe_get_ring_buf();
-void spe_reflash_ring_buf();
-char *spe_get_name();
-int spe_get_cycle();
+const struct DataRingBuf *spe_get_ring_buf();
+void spe_run(const struct Param *param);
 
 #ifdef __cplusplus
 }

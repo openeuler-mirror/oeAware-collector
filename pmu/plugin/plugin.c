@@ -9,7 +9,7 @@
  * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
  * See the Mulan PSL v2 for more details.
  ******************************************************************************/
-#include "collector.h"
+#include "interface.h"
 #include "plugin_sampling.h"
 #include "plugin_counting.h"
 #include "plugin_uncore.h"
@@ -17,61 +17,65 @@
 
 #define INS_COLLECTOR_MAX 10
 
-static struct CollectorInterface ins_collector[INS_COLLECTOR_MAX] = {0};
+static struct Interface ins_collector[INS_COLLECTOR_MAX] = {0};
 
-struct CollectorInterface sampling_collector = {
+struct Interface sampling_collector = {
     .get_version = sampling_get_version,
     .get_description = sampling_get_description,
+    .get_priority = sampling_get_priority,
     .get_type = sampling_get_type,
     .get_dep = sampling_get_dep,
     .get_name = sampling_get_name,
-    .get_cycle = sampling_get_cycle,
+    .get_period = sampling_get_period,
     .enable = sampling_enable,
     .disable = sampling_disable,
     .get_ring_buf = sampling_get_ring_buf,
-    .reflash_ring_buf = sampling_reflash_ring_buf,
+    .run = sampling_run,
 };
 
-struct CollectorInterface counting_collector = {
+struct Interface counting_collector = {
     .get_version = counting_get_version,
     .get_description = counting_get_description,
+    .get_priority = counting_get_priority,
     .get_type = counting_get_type,
     .get_dep = counting_get_dep,
     .get_name = counting_get_name,
-    .get_cycle = counting_get_cycle,
+    .get_period = counting_get_period,
     .enable = counting_enable,
     .disable = counting_disable,
     .get_ring_buf = counting_get_ring_buf,
-    .reflash_ring_buf = counting_reflash_ring_buf,
+    .run = counting_run,
 };
 
-struct CollectorInterface uncore_collector = {
+struct Interface uncore_collector = {
     .get_version = uncore_get_version,
     .get_description = uncore_get_description,
+    .get_priority = uncore_get_priority,
     .get_type = uncore_get_type,
     .get_dep = uncore_get_dep,
     .get_name = uncore_get_name,
-    .get_cycle = uncore_get_cycle,
+    .get_period = uncore_get_period,
     .enable = uncore_enable,
     .disable = uncore_disable,
     .get_ring_buf = uncore_get_ring_buf,
-    .reflash_ring_buf = uncore_reflash_ring_buf,
+    .run = uncore_run,
 };
 
-struct CollectorInterface spe_collector = {
+struct Interface spe_collector = {
     .get_version = spe_get_version,
     .get_description = spe_get_description,
+    .get_priority = spe_get_priority,
     .get_type = spe_get_type,
     .get_dep = spe_get_dep,
     .get_name = spe_get_name,
-    .get_cycle = spe_get_cycle,
+    .get_period = spe_get_period,
     .enable = spe_enable,
     .disable = spe_disable,
     .get_ring_buf = spe_get_ring_buf,
-    .reflash_ring_buf = spe_reflash_ring_buf,
+    .run = spe_run,
 };
 
-int get_instance(struct CollectorInterface **ins)
+int get_instance(struct Interface **interface)
 {
     int ins_count = 0;
 
@@ -79,7 +83,7 @@ int get_instance(struct CollectorInterface **ins)
     ins_collector[ins_count++] = counting_collector;
     ins_collector[ins_count++] = uncore_collector;
     ins_collector[ins_count++] = spe_collector;
-    *ins = &ins_collector[0];
+    *interface = &ins_collector[0];
 
     return ins_count;
 }
