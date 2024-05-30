@@ -11,11 +11,8 @@
  ******************************************************************************/
 #include "interface.h"
 #include "thread_info.h"
-#include <cstdio>
 #include <fstream>
 #include <string>
-#include <cstring>
-#include <cstdlib>
 #include <vector>
 #include <dirent.h>
 
@@ -65,7 +62,8 @@ static int get_all_threads() {
             if (num < THREAD_NUM) {
                 threads[num++] = ThreadInfo{pid, tid, name};
             }
-        }
+            status_file.close();
+        } 
         closedir(task_dir);
         
     }
@@ -92,6 +90,8 @@ int get_priority() {
     return 0;
 }
 bool enable() {
+    ring_buf.count = 0;
+    ring_buf.index = -1;
     ring_buf.buf_len = 1;
     ring_buf.buf = &data_buf; 
     return true;
@@ -106,16 +106,14 @@ const DataRingBuf* get_ring_buf() {
 }
 
 void run(const Param *param) {
-    if (param != nullptr) {
-        return;
-    }
-    ring_buf.index++;
+    (void)param;
     ring_buf.count++;
-    int index = ring_buf.count % ring_buf.buf_len;
+    int index = (ring_buf.index + 1) % ring_buf.buf_len;
     int num = get_all_threads();
     data_buf.len = num;
     data_buf.data = threads.data();
     ring_buf.buf[index] = data_buf;
+    ring_buf.index = index;
 }
 
 struct Interface thread_collect = {
