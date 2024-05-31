@@ -18,7 +18,7 @@
 
 const std::string PATH = "/proc";
 char thread_name[] = "thread_collector";
-const int CYCLE_SIZE = 100;
+const int CYCLE_SIZE = 500;
 const std::string STATUS_NAME = "Name:\t";
 const int STATUS_NAME_LENGTH = 6;
 static DataRingBuf ring_buf;
