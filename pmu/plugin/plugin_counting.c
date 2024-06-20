@@ -118,7 +118,7 @@ static void counting_reflash_ring_buf()
 
     data_ringbuf = (struct DataRingBuf *)counting_buf;
     if (!data_ringbuf) {
-        printf("counting_buf has not malloc\n");
+        printf("counting_buf has no malloc\n");
         return;
     }
 
