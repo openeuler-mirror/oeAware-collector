@@ -20,6 +20,7 @@ extern "C" {
 #define PMU_CYCLES_SAMPLING "pmu_cycles_sampling"
 #define PMU_UNCORE "pmu_uncore_counting"
 #define PMU_SPE "pmu_spe_sampling"
+#define PMU_NETIF_RX "pmu_netif_rx_counting"
 
 #ifdef __cplusplus
 }

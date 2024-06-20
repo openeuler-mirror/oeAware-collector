@@ -14,6 +14,7 @@
 #include "plugin_counting.h"
 #include "plugin_uncore.h"
 #include "plugin_spe.h"
+#include "plugin_netif_rx.h"
 
 #define INS_COLLECTOR_MAX 10
 
@@ -75,6 +76,20 @@ struct Interface spe_collector = {
     .run = spe_run,
 };
 
+struct Interface netif_rx_collector = {
+    .get_version = netif_rx_get_version,
+    .get_description = netif_rx_get_description,
+    .get_priority = netif_rx_get_priority,
+    .get_type = netif_rx_get_type,
+    .get_dep = netif_rx_get_dep,
+    .get_name = netif_rx_get_name,
+    .get_period = netif_rx_get_period,
+    .enable = netif_rx_enable,
+    .disable = netif_rx_disable,
+    .get_ring_buf = netif_rx_get_ring_buf,
+    .run = netif_rx_run,
+};
+
 int get_instance(struct Interface **interface)
 {
     int ins_count = 0;
@@ -83,6 +98,7 @@ int get_instance(struct Interface **interface)
     ins_collector[ins_count++] = counting_collector;
     ins_collector[ins_count++] = uncore_collector;
     ins_collector[ins_count++] = spe_collector;
+    ins_collector[ins_count++] = netif_rx_collector;
     *interface = &ins_collector[0];
 
     return ins_count;

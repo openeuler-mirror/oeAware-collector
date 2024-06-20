@@ -22,6 +22,7 @@ set(pmu_src
     plugin/plugin_spe.c
     plugin/plugin_uncore.c
     plugin/pmu_uncore.c
+    plugin/plugin_netif_rx.c
     plugin/plugin_comm.c
     plugin/plugin.c
 )

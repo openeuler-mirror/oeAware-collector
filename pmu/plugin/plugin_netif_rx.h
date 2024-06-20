@@ -9,25 +9,24 @@
  * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
  * See the Mulan PSL v2 for more details.
  ******************************************************************************/
-#ifndef __PLUGIN_COMM_H__
-#define __PLUGIN_COMM_H__
+#ifndef __PLUGIN_NETIF_RX_H__
+#define __PLUGIN_NETIF_RX_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define CYCLES_COUNTING_BUF_SIZE  10
-#define CYCLES_SAMPLING_BUF_SIZE  10
-#define UNCORE_BUF_SIZE           10
-#define SPE_BUF_SIZE              10
-#define NETIF_RX_BUF_SIZE         10
-
-struct DataRingBuf;
-struct PmuData;
-
-struct DataRingBuf *init_buf(int buf_len, const char *instance_name);
-void free_buf(struct DataRingBuf *data_ringbuf);
-void fill_buf(struct DataRingBuf *data_ringbuf, struct PmuData *pmu_data, int len);
+const char *netif_rx_get_version();
+const char *netif_rx_get_name();
+const char *netif_rx_get_description();
+const char *netif_rx_get_dep();
+int netif_rx_get_priority();
+int netif_rx_get_type();
+int netif_rx_get_period();
+bool netif_rx_enable();
+void netif_rx_disable();
+const struct DataRingBuf *netif_rx_get_ring_buf();
+void netif_rx_run(const struct Param *param);
 
 #ifdef __cplusplus
 }
