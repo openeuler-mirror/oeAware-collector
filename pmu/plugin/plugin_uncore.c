@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <securec.h>
 #include "pmu.h"
 #include "pcerrc.h"
 #include "interface.h"
@@ -77,6 +78,8 @@ static int uncore_open()
         evtList[i + hha_num * RX_SCCL] = rx_sccl[i].uncore_name;
         evtList[i + hha_num * RX_OPS_NUM] = rx_ops_num[i].uncore_name;
     }
+
+    (void)memset_s(&attr, sizeof(struct PmuAttr), 0, sizeof(struct PmuAttr));
 
     attr.evtList = evtList;
     attr.numEvt = hha_num * UNCORE_MAX;

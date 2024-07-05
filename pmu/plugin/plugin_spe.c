@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <securec.h>
 #include "pmu.h"
 #include "pcerrc.h"
 #include "interface.h"
@@ -48,6 +49,8 @@ static int spe_open()
 {
     struct PmuAttr attr;
     int pd;
+
+    (void)memset_s(&attr, sizeof(struct PmuAttr), 0, sizeof(struct PmuAttr));
 
     attr.evtList = NULL;
     attr.numEvt = 0;
