@@ -11,8 +11,10 @@
  ******************************************************************************/
 #include "interface.h"
 #include "thread_info.h"
+#include <iostream>
 #include <string>
 #include <vector>
+#include <fstream>
 #include <unordered_map>
 #include <csignal>
 #include <dirent.h>
@@ -20,7 +22,6 @@
 
 char thread_name[] = "thread_collector";
 const int CYCLE_SIZE = 500;
-const int MAX_NAME_LENGTH = 20;
 static DataRingBuf ring_buf;
 static DataBuf data_buf;
 static ThreadInfo threads[THREAD_NUM];
@@ -60,14 +61,13 @@ static void clear_invalid_tid(int &num) {
 
 static ThreadInfo get_thread_info(int pid, int tid) {
     std::string s_path = "/proc/" + std::to_string(pid) + "/task/" + std::to_string(tid) + "/comm";
-    FILE *s_file = fopen(s_path.c_str(), "r");
-    if (s_file == nullptr) {
+    std::ifstream input_file(s_path); 
+    if (!input_file) {
         return ThreadInfo{};
     }
-    char name[MAX_NAME_LENGTH];
-    fscanf(s_file, "%s", name);
-    fclose(s_file);
-    return ThreadInfo{pid, tid, std::string(name)};
+    std::string name;
+    input_file >> name;
+    return ThreadInfo{pid, tid, name};
 }
 
 static bool process_not_change(struct stat *task_stat, const std::string &task_path, int pid) {
