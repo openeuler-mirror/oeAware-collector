@@ -19,6 +19,7 @@
 #include <csignal>
 #include <dirent.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 char thread_name[] = "thread_collector";
 const int CYCLE_SIZE = 500;
