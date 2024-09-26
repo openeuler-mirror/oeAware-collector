@@ -63,6 +63,7 @@ static int sampling_open()
     attr.numCpu = 0;
     attr.freq = 100;
     attr.useFreq = 1;
+    attr.symbolMode = RESOLVE_ELF;
 
     pd = PmuOpen(SAMPLING, &attr);
     if (pd == -1) {
