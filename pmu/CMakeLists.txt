@@ -24,6 +24,8 @@ set(pmu_src
     plugin/pmu_uncore.c
     plugin/plugin_netif_rx.c
     plugin/plugin_comm.c
+    plugin/plugin_napi_gro_receive_entry.c
+    plugin/plugin_skb_copy_datagram_iovec.c
     plugin/plugin.c
 )
 
