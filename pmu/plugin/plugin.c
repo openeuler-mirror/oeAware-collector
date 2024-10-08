@@ -15,6 +15,8 @@
 #include "plugin_uncore.h"
 #include "plugin_spe.h"
 #include "plugin_netif_rx.h"
+#include "plugin_napi_gro_receive_entry.h"
+#include "plugin_skb_copy_datagram_iovec.h"
 
 #define INS_COLLECTOR_MAX 10
 
@@ -90,6 +92,33 @@ struct Interface netif_rx_collector = {
     .run = netif_rx_run,
 };
 
+struct Interface g_napiGroRecEntryCollector = {
+    .get_version = NapiGroRecEntryGetVer,
+    .get_description = NapiGroRecEntryGetDes,
+    .get_priority = NapiGroRecEntryGetPriority,
+    .get_type = NapiGroRecEntryGetType,
+    .get_dep = NapiGroRecEntryGetDep,
+    .get_name = NapiGroRecEntryGetName,
+    .get_period = NapiGroRecEntryGetPeriod,
+    .enable = NapiGroRecEntryEnable,
+    .disable = NapiGroRecEntryDisable,
+    .get_ring_buf = NapiGroRecEntryGetBuf,
+    .run = NapiGroRecEntryRun,
+};
+
+struct Interface g_skbCopyDatagramIovecCollector = {
+    .get_version = SkbCopyDatagramIovecGetVer,
+    .get_description = SkbCopyDatagramIovecGetDes,
+    .get_priority = SkbCopyDatagramIovecGetPriority,
+    .get_type = SkbCopyDatagramIovecGetType,
+    .get_dep = SkbCopyDatagramIovecGetDep,
+    .get_name = SkbCopyDatagramIovecGetName,
+    .get_period = SkbCopyDatagramIovecGetPeriod,
+    .enable = SkbCopyDatagramIovecEnable,
+    .disable = SkbCopyDatagramIovecDisable,
+    .get_ring_buf = SkbCopyDatagramIovecGetBuf,
+    .run = SkbCopyDatagramIovecRun,
+};
 int get_instance(struct Interface **interface)
 {
     int ins_count = 0;
@@ -99,6 +128,8 @@ int get_instance(struct Interface **interface)
     ins_collector[ins_count++] = uncore_collector;
     ins_collector[ins_count++] = spe_collector;
     ins_collector[ins_count++] = netif_rx_collector;
+    ins_collector[ins_count++] = g_napiGroRecEntryCollector;
+    ins_collector[ins_count++] = g_skbCopyDatagramIovecCollector;
     *interface = &ins_collector[0];
 
     return ins_count;
